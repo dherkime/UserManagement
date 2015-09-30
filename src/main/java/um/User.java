@@ -3,6 +3,8 @@ package um;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Objects;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -13,9 +15,10 @@ import java.util.Date;
 /**
  * Created by don on 9/28/15.
  */
+@Document(collection="users")
 public class User {
 
-    @NotNull
+    @Id
     private String id;
 
     @NotNull
@@ -29,6 +32,8 @@ public class User {
     private String password;
 
     private Date lastLogin;
+
+    private String emailAddress;
 
     @JsonCreator
     public User(@JsonProperty("name") String name,
@@ -81,6 +86,8 @@ public class User {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(this).toString();
+        return String.format(
+                "User[id=%s, name='%s', lastLogin='%tF']",
+                id, name, lastLogin);
     }
 }

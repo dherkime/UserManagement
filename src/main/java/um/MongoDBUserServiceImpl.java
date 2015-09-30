@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -66,6 +67,8 @@ public class MongoDBUserServiceImpl implements UserService
             throw new LoginRefusedException("Invalid email address or password", InvalidLoginEnum.InvalidPassword);
         }
 
+        user.setLastLogin(new Date());
+        update(user);
         return user;
     }
 }
