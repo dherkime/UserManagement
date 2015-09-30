@@ -1,0 +1,11 @@
+#Returns a 201 (Created)
+curl -H "Content-Type: application/json" -X POST -v -d '{"emailAddress":"dherkime@gmail.com","name":"Don Herkimer","password":"xyz"}' http://localhost:9000/api/users
+
+#Returns a 200 (OK)
+curl -X GET -v "http://localhost:9000/api/users"
+
+#Returns a 201 (Created)
+curl -X GET -v "http://localhost:9000/api/users/login?emailAddress=dherkime@gmail.com&password=xyz"
+
+#Returns a 400 (Bad Request) due to the invalid password
+curl -X GET -v "http://localhost:9000/api/users/login?emailAddress=dherkime@gmail.com&password=xxx"

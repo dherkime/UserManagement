@@ -1,0 +1,18 @@
+HTTP/1.1 301 Moved Permanently
+Server: nginx
+Date: Tue, 29 Sep 2015 14:18:39 GMT
+Content-Type: text/html
+Transfer-Encoding: chunked
+Connection: close
+Location: http://localhost
+Expires: Tue, 29 Sep 2015 14:18:38 GMT
+Cache-Control: no-cache
+
+HTTP/1.1 400 Bad Request
+Server: Apache-Coyote/1.1
+X-Application-Context: application:standalone:9000
+Content-Type: application/json;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Tue, 29 Sep 2015 14:18:42 GMT
+Connection: close
+
