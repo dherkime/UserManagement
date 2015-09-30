@@ -1,7 +1,6 @@
 package um;
 
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,6 +25,9 @@ import static org.junit.Assert.assertEquals;
 @IntegrationTest({ "server.port=0", "management.port=0" })
 @DirtiesContext
 public class ConfigurationTests {
+	public static final User SPECIFIC_USER = new User("Don Herkimer", "dh@gmail.com", "xyz");
+
+    private ResponseEntity<User> postedUser;
 
 	@Value("${local.server.port}")
 	private int port;
@@ -40,5 +42,23 @@ public class ConfigurationTests {
 				"http://localhost:" + this.port + "/api/users", List.class);
 		assertEquals(HttpStatus.OK, entity.getStatusCode());
 	}
+
+	@Test
+	public void testGetSpecificUser() throws Exception {
+        final ResponseEntity<User> postedUser = postSpecificUser();
+        String emailAddress = postedUser.getBody().getEmailAddress();
+        ResponseEntity<User> user = new TestRestTemplate().getForEntity(
+				"http://localhost:" + this.port + "/api/users/" + emailAddress + "/", User.class);
+		assertEquals("Couldn't find user with ID \"" + emailAddress + "\"", HttpStatus.OK, user.getStatusCode());
+	}
+
+    private ResponseEntity<User> postSpecificUser() {
+        if (null != postedUser) {
+            return postedUser;
+        }
+        postedUser = new TestRestTemplate().postForEntity(
+                "http://localhost:" + this.port + "/api/users/" + SPECIFIC_USER.getEmailAddress(), SPECIFIC_USER, User.class);
+        return postedUser;
+    }
 
 }
