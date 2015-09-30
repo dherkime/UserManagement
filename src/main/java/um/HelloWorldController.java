@@ -26,14 +26,14 @@ public class HelloWorldController {
 
     @RequestMapping(value = "/users")
     @ResponseBody
-    public HttpEntity<List<User>> list() {
+    public HttpEntity<List<UserResource>> list() {
         final List<User> users = new ArrayList<User>(); //userService.findAll();
         users.add(new User("don", "dherkime@gmail.com", "password"));
         final List<UserResource> userResources = UserResource.from(users);
-//        for (UserResource userResource : userResources) {
-//            userResource.add(linkTo(methodOn(HelloWorldController.class).list()).withSelfRel());
-//        }
-        return new ResponseEntity<List<User>>(users, HttpStatus.OK);
+        for (UserResource userResource : userResources) {
+            userResource.add(linkTo(methodOn(HelloWorldController.class).list()).withSelfRel());
+        }
+        return new ResponseEntity<List<UserResource>>(userResources, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/users/{id}")
@@ -44,7 +44,12 @@ public class HelloWorldController {
             throw new UserNotFoundException("The user with id \"" + id + "\" was not found.");
         }
         final UserResource userResource = UserResource.from(user);
-        userResource.add(linkTo(methodOn(HelloWorldController.class).user(id)).withSelfRel());
+
+        //Note the trailing slash...  I believe this is necessary so that Spring MVC can properly
+        //extract the email address as the {id} and not just extract the portion before the dot
+        Link link = new Link(linkTo(methodOn(HelloWorldController.class).user(id)).withSelfRel().getHref() + "/");
+        userResource.add(link);
+
         return new ResponseEntity<UserResource>(userResource, HttpStatus.OK);
     }
 

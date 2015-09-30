@@ -3,6 +3,7 @@
 .project
 .settings/
 .idea/
+user-management.iml
 bin/
 build/
 target/

@@ -1,6 +1,9 @@
 #Returns a 201 (Created)
 curl -H "Content-Type: application/json" -X POST -v -d '{"emailAddress":"dherkime@gmail.com","name":"Don Herkimer","password":"xyz"}' http://localhost:9000/api/users
 
+#Returns a 409 (Conflict) due to the POST of a duplicate resource
+curl -H "Content-Type: application/json" -X POST -v -d '{"emailAddress":"dherkime@gmail.com","name":"Don Herkimer","password":"xyz"}' http://localhost:9000/api/users
+
 #Returns a 200 (OK)
 curl -X GET -v "http://localhost:9000/api/users"
 
@@ -9,3 +12,7 @@ curl -X GET -v "http://localhost:9000/api/users/login?emailAddress=dherkime@gmai
 
 #Returns a 400 (Bad Request) due to the invalid password
 curl -X GET -v "http://localhost:9000/api/users/login?emailAddress=dherkime@gmail.com&password=xxx"
+
+#Get a specific user.  Note the trailing slash after the email address...  I think this might be
+#a Spring MVC bug with how it extracts 
+curl -X GET -v "http://localhost:9000/api/users/dherkime@gmail.com/"

@@ -13,9 +13,7 @@ import java.util.stream.Collectors;
 public class UserResource extends ResourceSupport {
 
     private String emailAddress;
-
     private String name;
-
     private String password;
 
     public UserResource() {
@@ -30,11 +28,6 @@ public class UserResource extends ResourceSupport {
         this.password = password;
     }
 
-
-    public User toUser() {
-        return new User(this.name, this.emailAddress, this.password);
-    }
-
     public static UserResource from(User user) {
         return new UserResource(user.getEmailAddress(), user.getName(), user.getPassword());
     }
@@ -43,6 +36,34 @@ public class UserResource extends ResourceSupport {
         return users.stream()
                 .map(user -> from(user))
                 .collect(Collectors.toList());
+    }
+
+    public String getEmailAddress() {
+        return emailAddress;
+    }
+
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public User toUser() {
+        return new User(this.name, this.emailAddress, this.password);
     }
 }
 
