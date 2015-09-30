@@ -3,7 +3,8 @@ Spring boot REST service for basic user CRUD
 
 ## Installation
 
-1. (Optional; the app can also be run standalone) Install [MongoDB](http://docs.mongodb.org/master/installation/) and fire up the Mongo daemon: `mongod`
+1. Clone
+2. (Optional; the app can also be run standalone) Install [MongoDB](http://docs.mongodb.org/master/installation/) and fire up the Mongo daemon: `mongod`
 
 ## Fire up the app
 
