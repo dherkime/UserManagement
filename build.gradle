@@ -11,6 +11,7 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'spring-boot'
+apply plugin: "jacoco"
 
 jar {
     baseName = 'user-management'
@@ -35,6 +36,17 @@ dependencies {
 
     testCompile("org.springframework.boot:spring-boot-starter-test")
     testCompile("junit:junit")
+}
+
+jacoco {
+    toolVersion = "0.7.1.201405082137"
+    reportsDir = file("$buildDir/customJacocoReportDir")
+}
+
+jacocoTestReport {
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports after running tests."
+    additionalSourceDirs = files(sourceSets.main.allJava.srcDirs)
 }
 
 task wrapper(type: Wrapper) {
