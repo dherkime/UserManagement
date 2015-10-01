@@ -1,4 +1,6 @@
-package um;
+package exceptions;
+
+import domain.User;
 
 /**
  * Created by don on 9/28/15.

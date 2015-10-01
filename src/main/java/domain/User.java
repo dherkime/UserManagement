@@ -1,4 +1,4 @@
-package um;
+package domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.Date;
 
 
@@ -16,7 +17,7 @@ import java.util.Date;
  * Created by don on 9/28/15.
  */
 @Document(collection="users")
-public class User {
+public class User implements Serializable {
 
     @Id
     private String id;
@@ -42,6 +43,7 @@ public class User {
         this.name = name;
         this.id = emailAddress;
         this.password = password;
+        this.emailAddress = emailAddress;
     }
 
     public String getId() {

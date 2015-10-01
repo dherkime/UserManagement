@@ -2,6 +2,9 @@ package um;
 
 import java.util.List;
 
+import domain.User;
+import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,43 +25,68 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Configuration.class)
 @WebAppConfiguration
-@IntegrationTest({ "server.port=0", "management.port=0" })
+@IntegrationTest({"server.port=0", "management.port=0"})
 @DirtiesContext
 public class ConfigurationTests {
-	public static final User SPECIFIC_USER = new User("Don Herkimer", "dh@gmail.com", "xyz");
+    public static final String DH_GMAIL_COM = "dh@gmail.com";
 
-    private ResponseEntity<User> postedUser;
+    private ResponseEntity<User> testUser;
 
-	@Value("${local.server.port}")
-	private int port;
+    private TestRestTemplate restTemplate = new TestRestTemplate();
 
-	@Value("${local.management.port}")
-	private int mgt;
+    @Value("${local.server.port}")
+    private int port;
 
-	@Test
-	public void testUsers() throws Exception {
-		@SuppressWarnings("rawtypes")
-		ResponseEntity<List> entity = new TestRestTemplate().getForEntity(
-				"http://localhost:" + this.port + "/api/users", List.class);
-		assertEquals(HttpStatus.OK, entity.getStatusCode());
-	}
+    @Value("${local.management.port}")
+    private int mgt;
 
-	@Test
-	public void testGetSpecificUser() throws Exception {
-        final ResponseEntity<User> postedUser = postSpecificUser();
-        String emailAddress = postedUser.getBody().getEmailAddress();
-        ResponseEntity<User> user = new TestRestTemplate().getForEntity(
-				"http://localhost:" + this.port + "/api/users/" + emailAddress + "/", User.class);
-		assertEquals("Couldn't find user with ID \"" + emailAddress + "\"", HttpStatus.OK, user.getStatusCode());
-	}
+    @Before
+    public void setup() {
+        postTestUser();
+    }
 
-    private ResponseEntity<User> postSpecificUser() {
-        if (null != postedUser) {
-            return postedUser;
+    @Test
+    public void testUsers() throws Exception {
+        @SuppressWarnings("rawtypes")
+        ResponseEntity<List> entity = restTemplate.getForEntity(
+                "http://localhost:" + this.port + "/api/users", List.class);
+        assertEquals(HttpStatus.OK, entity.getStatusCode());
+    }
+
+    @Test
+    public void testGetSpecificUser() throws Exception {
+        ResponseEntity<User> user = findTestUser();
+        assertEquals("Couldn't find user with ID \"" + DH_GMAIL_COM + "\"", HttpStatus.OK, user.getStatusCode());
+    }
+
+    //FIXME: Delete isn't working
+    @Ignore("Delete isn't working")
+    @Test
+    public void testDeleteSpecificUser() throws Exception {
+        restTemplate.delete(getUrl() + DH_GMAIL_COM);
+        final ResponseEntity<User> testUser = findTestUser();
+        assertEquals("Found user with ID \"" + DH_GMAIL_COM + "\"", HttpStatus.NOT_FOUND, testUser.getStatusCode());
+    }
+
+    //public void test
+
+    private ResponseEntity<User> findTestUser() {
+        return restTemplate.getForEntity(
+                getUrl() + DH_GMAIL_COM + "/", User.class);
+    }
+
+    private String getUrl() {
+        return "http://localhost:" + this.port + "/api/users/";
+    }
+
+
+    private void postTestUser() {
+        if (null != testUser) {
+            return;
         }
-        postedUser = new TestRestTemplate().postForEntity(
-                "http://localhost:" + this.port + "/api/users/" + SPECIFIC_USER.getEmailAddress(), SPECIFIC_USER, User.class);
-        return postedUser;
+
+        testUser = restTemplate.postForEntity(
+                "http://localhost:" + this.port + "/api/users", new User("Don Herkimer", DH_GMAIL_COM, "xyz"), User.class);
     }
 
 }

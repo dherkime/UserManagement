@@ -1,4 +1,4 @@
-package um;
+package exceptions;
 
 /**
  * Created by don on 9/29/15.

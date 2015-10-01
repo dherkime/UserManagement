@@ -1,8 +1,13 @@
 package um;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import domain.User;
+import domain.UserResource;
+import exceptions.ErrorInfo;
+import exceptions.LoginRefusedException;
+import exceptions.UserEmailAddressInUseException;
+import exceptions.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpEntity;
@@ -58,6 +63,16 @@ public class HelloWorldController {
     @ResponseBody
     public HttpEntity<UserResource> create(@Valid @RequestBody UserResource userResource) {
         final User user = userService.create(userResource.toUser());
+        final UserResource createdUserResource = UserResource.from(user);
+        Link link = linkTo(methodOn(HelloWorldController.class).user(user.getId() + "/")).withSelfRel();
+        createdUserResource.add(link);
+        return new ResponseEntity<UserResource>(createdUserResource, HttpStatus.CREATED);
+    }
+
+    @RequestMapping(value = "/users", method = RequestMethod.PUT)
+    @ResponseBody
+    public HttpEntity<UserResource> update(@Valid @RequestBody UserResource userResource) {
+        final User user = userService.update(userResource.toUser());
         final UserResource createdUserResource = UserResource.from(user);
         Link link = linkTo(methodOn(HelloWorldController.class).user(user.getId() + "/")).withSelfRel();
         createdUserResource.add(link);
