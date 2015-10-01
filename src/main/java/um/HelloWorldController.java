@@ -80,8 +80,8 @@ public class HelloWorldController {
     }
 
     @RequestMapping(value = "/users/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<String> delete(@PathVariable String emailAddress) {
-        userService.delete(emailAddress);
+    public ResponseEntity<String> delete(@PathVariable String id) {
+        userService.delete(id);
         return new ResponseEntity<String>(HttpStatus.OK);
     }
 

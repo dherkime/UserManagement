@@ -27,11 +27,12 @@ public class AbstractUserServiceImpl implements UserService {
 
     @Override
     public User create(User user) {
-        final User existingUser = findById(user.getEmailAddress());
-        if (null != existingUser) {
-            throw new UserEmailAddressInUseException(user);
+        try {
+            findById(user.getEmailAddress());
+        } catch (UserNotFoundException e) {
+            return repository.save(user);
         }
-        return repository.save(user);
+        throw new UserEmailAddressInUseException(user);
     }
 
     @Override

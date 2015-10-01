@@ -3,6 +3,7 @@ package um;
 import java.util.List;
 
 import domain.User;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -14,10 +15,13 @@ import org.springframework.boot.test.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * Test the endpoints
@@ -29,6 +33,7 @@ import static org.junit.Assert.assertEquals;
 @DirtiesContext
 public class ConfigurationTests {
     public static final String DH_GMAIL_COM = "dh@gmail.com";
+    public static final String DH_GMAIL_COM_TRAILING_SLASH = DH_GMAIL_COM + "/";
 
     private ResponseEntity<User> testUser;
 
@@ -45,34 +50,56 @@ public class ConfigurationTests {
         postTestUser();
     }
 
+    @After
+    public void teardown() {
+        restTemplate.delete(getUrl() + DH_GMAIL_COM_TRAILING_SLASH);
+    }
+
     @Test
-    public void testUsers() throws Exception {
+    public void testGetUsers() throws Exception {
         @SuppressWarnings("rawtypes")
-        ResponseEntity<List> entity = restTemplate.getForEntity(
+        final ResponseEntity<List> entity = restTemplate.getForEntity(
                 "http://localhost:" + this.port + "/api/users", List.class);
         assertEquals(HttpStatus.OK, entity.getStatusCode());
     }
 
     @Test
-    public void testGetSpecificUser() throws Exception {
-        ResponseEntity<User> user = findTestUser();
-        assertEquals("Couldn't find user with ID \"" + DH_GMAIL_COM + "\"", HttpStatus.OK, user.getStatusCode());
+    public void testGetUser() throws Exception {
+        final ResponseEntity<User> user = findTestUser();
+        assertEquals("Couldn't find user with ID \"" + DH_GMAIL_COM + "\"!", HttpStatus.OK, user.getStatusCode());
     }
 
-    //FIXME: Delete isn't working
-    @Ignore("Delete isn't working")
     @Test
-    public void testDeleteSpecificUser() throws Exception {
-        restTemplate.delete(getUrl() + DH_GMAIL_COM);
+    public void testDeleteUser() throws Exception {
+        restTemplate.delete(getUrl() + DH_GMAIL_COM_TRAILING_SLASH);
         final ResponseEntity<User> testUser = findTestUser();
-        assertEquals("Found user with ID \"" + DH_GMAIL_COM + "\"", HttpStatus.NOT_FOUND, testUser.getStatusCode());
+        assertEquals("Found user with ID \"" + DH_GMAIL_COM + "\"!", HttpStatus.NOT_FOUND, testUser.getStatusCode());
     }
 
-    //public void test
+    @Test
+    public void testUpdateUser() {
+        final User user = testUser.getBody();
+        final String updatedName = "Donald Herkimer";
+        user.setName(updatedName);
+        restTemplate.put(getUrl(), user);
+        ResponseEntity<User> updatedUser = findTestUser();
+        assertEquals("The user's name wasn't updated!", updatedName, updatedUser.getBody().getName());
+    }
+
+    @Ignore("Jackson is complaining about the date format when deserializing into a User")
+    @Test
+    public void testLoginUser() {
+        final User user = testUser.getBody();
+        assertNull("The last login is not null!", user.getLastLogin());
+        restTemplate.getForEntity(getUrl() + "/login?emailAddress={email}&password={pwd}", User.class, user.getEmailAddress(), user.getPassword());
+        ResponseEntity<User> loggedInUser = findTestUser();
+        assertNotNull("The user's last login was null!", loggedInUser.getBody().getLastLogin());
+
+    }
 
     private ResponseEntity<User> findTestUser() {
         return restTemplate.getForEntity(
-                getUrl() + DH_GMAIL_COM + "/", User.class);
+                getUrl() + DH_GMAIL_COM_TRAILING_SLASH, User.class);
     }
 
     private String getUrl() {
@@ -85,8 +112,7 @@ public class ConfigurationTests {
             return;
         }
 
-        testUser = restTemplate.postForEntity(
-                "http://localhost:" + this.port + "/api/users", new User("Don Herkimer", DH_GMAIL_COM, "xyz"), User.class);
+        testUser = restTemplate.postForEntity("http://localhost:" + this.port + "/api/users", new User("Don Herkimer", DH_GMAIL_COM, "xyz"), User.class);
     }
 
 }
