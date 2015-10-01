@@ -1,6 +1,7 @@
 package um;
 
 import java.util.List;
+import java.util.Map;
 
 import domain.User;
 import org.junit.After;
@@ -86,20 +87,23 @@ public class ConfigurationTests {
         assertEquals("The user's name wasn't updated!", updatedName, updatedUser.getBody().getName());
     }
 
-    @Ignore("Jackson is complaining about the date format when deserializing into a User")
     @Test
     public void testLoginUser() {
         final User user = testUser.getBody();
         assertNull("The last login is not null!", user.getLastLogin());
-        restTemplate.getForEntity(getUrl() + "/login?emailAddress={email}&password={pwd}", User.class, user.getEmailAddress(), user.getPassword());
-        ResponseEntity<User> loggedInUser = findTestUser();
-        assertNotNull("The user's last login was null!", loggedInUser.getBody().getLastLogin());
-
+        restTemplate.getForEntity(getUrl() + "/login?emailAddress={email}&password={pwd}", Map.class, user.getEmailAddress(), user.getPassword());
+        ResponseEntity<Map> loggedInUser = findTestUserMap();
+        assertNotNull("The user's last login was null!", loggedInUser.getBody().get("lastLogin"));
     }
 
     private ResponseEntity<User> findTestUser() {
         return restTemplate.getForEntity(
                 getUrl() + DH_GMAIL_COM_TRAILING_SLASH, User.class);
+    }
+
+    private ResponseEntity<Map> findTestUserMap() {
+        return restTemplate.getForEntity(
+                getUrl() + DH_GMAIL_COM_TRAILING_SLASH, Map.class);
     }
 
     private String getUrl() {
