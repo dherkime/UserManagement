@@ -2,8 +2,11 @@ package domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModel;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.hateoas.ResourceSupport;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,12 +14,17 @@ import java.util.stream.Collectors;
 /**
  * Created by don on 9/28/15.
  */
+@ApiModel(description = "The user with a name, email address as the ID, a last login date, and a password")
 public class UserResource extends ResourceSupport {
+    private static SimpleDateFormat SIMPLEDATEFORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
     private String emailAddress;
     private String name;
     private String password;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
     private Date lastLogin;
+
 
     public UserResource() {
     }
@@ -43,7 +51,10 @@ public class UserResource extends ResourceSupport {
     }
 
     public String getLastLogin() {
-        return lastLogin != null ? lastLogin.toString() : null;
+        if (null == lastLogin) {
+            return "";
+        }
+        return SIMPLEDATEFORMAT.format(lastLogin);
     }
 
     public void setLastLogin(Date lastLogin) {

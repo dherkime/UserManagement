@@ -25,7 +25,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 /**
- * Test the endpoints
+ * Created by don on 9/28/15.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Configuration.class)
@@ -92,18 +92,13 @@ public class ConfigurationTests {
         final User user = testUser.getBody();
         assertNull("The last login is not null!", user.getLastLogin());
         restTemplate.getForEntity(getUrl() + "/login?emailAddress={email}&password={pwd}", Map.class, user.getEmailAddress(), user.getPassword());
-        ResponseEntity<Map> loggedInUser = findTestUserMap();
-        assertNotNull("The user's last login was null!", loggedInUser.getBody().get("lastLogin"));
+        ResponseEntity<User> testUser = findTestUser();
+        assertNotNull("The user's last login was null!", testUser.getBody().getLastLogin());
     }
 
     private ResponseEntity<User> findTestUser() {
         return restTemplate.getForEntity(
                 getUrl() + DH_GMAIL_COM_TRAILING_SLASH, User.class);
-    }
-
-    private ResponseEntity<Map> findTestUserMap() {
-        return restTemplate.getForEntity(
-                getUrl() + DH_GMAIL_COM_TRAILING_SLASH, Map.class);
     }
 
     private String getUrl() {
